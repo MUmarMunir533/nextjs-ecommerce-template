@@ -14,12 +14,18 @@ const CartModalContext = createContext<CartModalContextType | undefined>(
 export const useCartModalContext = () => {
   const context = useContext(CartModalContext);
   if (!context) {
-    throw new Error("useModalContext must be used within a ModalProvider");
+    throw new Error(
+      "useCartModalContext must be used within a CartModalProvider"
+    );
   }
   return context;
 };
 
-export const CartModalProvider = ({ children }) => {
+export const CartModalProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
 
   const openCartModal = () => {
