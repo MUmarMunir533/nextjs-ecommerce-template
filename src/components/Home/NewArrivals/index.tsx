@@ -1,14 +1,36 @@
-import React from "react";
-import Image from "next/image";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import ProductItem from "@/components/Common/ProductItem";
-import shopData from "@/components/Shop/shopData";
+import ProductItem from "@/components/productitems";
+import { fetchShopify } from "@/hooks/fetchshopify";
+import { PRODUCTS_QUERY } from "@/graphql/queries/products";
 
 const NewArrival = () => {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetchShopify(PRODUCTS_QUERY);
+        const edges = response.data?.products?.edges || [];
+        const fetchedProducts = edges.map((edge: any) => edge.node);
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <section className="overflow-hidden pt-15">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-        {/* <!-- section title --> */}
+        {/* Section title */}
         <div className="mb-7 flex items-center justify-between">
           <div>
             <span className="flex items-center gap-2.5 font-medium text-dark mb-1.5">
@@ -31,7 +53,7 @@ const NewArrival = () => {
                   strokeLinecap="round"
                 />
               </svg>
-              This Week’s
+              This Week's
             </span>
             <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
               New Arrivals
@@ -47,10 +69,11 @@ const NewArrival = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-7.5 gap-y-9">
-          {/* <!-- New Arrivals item --> */}
-          {shopData.map((item, key) => (
-            <ProductItem item={item} key={key} />
-          ))}
+          {loading ? (
+            <p>Loading products...</p>
+          ) : (
+            products.map((item, key) => <ProductItem item={item} key={key} />)
+          )}
         </div>
       </div>
     </section>

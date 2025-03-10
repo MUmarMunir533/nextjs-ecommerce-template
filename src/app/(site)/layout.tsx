@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import "../css/euclid-circular-a-font.css";
 import "../css/style.css";
@@ -16,15 +17,30 @@ import PreviewSliderModal from "@/components/Common/PreviewSlider";
 import ScrollToTop from "@/components/Common/ScrollToTop";
 import PreLoader from "@/components/Common/PreLoader";
 
+import { fetchShopify } from "@/hooks/fetchshopify";
+import { PRODUCTS_QUERY } from "@/graphql/queries/products";
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const [loading, setLoading] = useState<boolean>(true);
+  const [shopifyData, setShopifyData] = useState<any>(null);
 
   useEffect(() => {
+    // Simulate a preloader delay
     setTimeout(() => setLoading(false), 1000);
+
+    // Fetch data from Shopify using our custom fetchShopify hook
+    fetchShopify(PRODUCTS_QUERY)
+      .then((data) => {
+        console.log("Shopify data:", data);
+        setShopifyData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching Shopify data:", error);
+      });
   }, []);
 
   return (
@@ -40,7 +56,6 @@ export default function RootLayout({
                   <PreviewSliderProvider>
                     <Header />
                     {children}
-
                     <QuickViewModal />
                     <CartSidebarModal />
                     <PreviewSliderModal />
